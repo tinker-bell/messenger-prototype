@@ -1,8 +1,8 @@
-
 Прототип коммуникационной платформы реализован с использованием
-React, Redux
-Python, tornado
-Webpack
+
+- React, Redux
+- Python, tornado
+- Webpack
 
 В прототипе реализована только возможность общения между двумя собеседниками. Вместо базы данных сделана заглушка.
 
@@ -21,8 +21,8 @@ python server.py
 ```
 
 3. Просмотр чатов от имени трех разных пользователей
-* http://localhost:8888/chat/account-1/
-* http://localhost:8888/chat/account-2/
-* http://localhost:8888/chat/account-3/
+- http://localhost:8888/chat/account-1/
+- http://localhost:8888/chat/account-2/
+- http://localhost:8888/chat/account-3/
 
 ![enter image description here](https://cdn.pbrd.co/images/kPvfJ98XE.png)
