@@ -21,7 +21,7 @@ class GetChat(tornado.web.RequestHandler):
     def get(self, account_from, account_to):
         messages_from = db.get_messages(account_from, account_to)
         messages_to = db.get_messages(account_to, account_from)
-        db.mark_message_as_read(account_from, account_to)
+        db.mark_message_as_read(account_to, account_from)
         chat = []
 
         def add_to_chat(a_from, msgs):

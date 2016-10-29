@@ -26,7 +26,7 @@ messagesWS.connect("ws://localhost:8888/messages", account.id);
 
 render(
   <Provider store={store}>
-    <App messagesWS={messagesWS} serverFacade={serverFacade} />
+    <App messenger={messenger} messagesWS={messagesWS} />
   </Provider>,
   document.getElementById('root')
 )

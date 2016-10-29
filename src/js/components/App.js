@@ -12,7 +12,7 @@ class App extends React.Component{
         return <div style={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', minHeight: '100%'}}>
             <div className="sidebar">
             <AccountDetails />
-            <ContactsList serverFacade={this.props.serverFacade}/>
+            <ContactsList messenger={this.props.messenger} />
             </div>
             { !!selectedContact ? <ChatPanel messagesWS={this.props.messagesWS}  /> : null }
         </div>;

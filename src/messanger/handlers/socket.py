@@ -12,7 +12,6 @@ class MessagesSocketHandler(tornado.websocket.WebSocketHandler):
         print("WebSocket opened")
 
     def on_message(self, message):
-        print(message)
         result = json.loads(message);
         data = result["data"]
 

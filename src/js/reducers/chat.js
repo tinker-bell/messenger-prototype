@@ -5,7 +5,6 @@ export default function chat(state = {chat: []}, action){
         case SET_CHAT:
           return {... state, chat: action.payload};
         case NEW_MESSAGE:
-            console.log(action);
             var newState = state.chat.slice();
             newState.push(action.payload);
             return {chat: newState}

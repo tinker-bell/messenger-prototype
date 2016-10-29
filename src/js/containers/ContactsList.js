@@ -2,7 +2,6 @@ import React from 'react';
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { ContactItem } from '../components/ContactItem'
-import { setSelectedContact, setChat } from '../actions'
 
 class ContactsList extends React.Component {
 
@@ -22,10 +21,7 @@ class ContactsList extends React.Component {
     }
 
     onSelectContact(contact){
-        const {dispatch, serverFacade} = this.props;
-        dispatch(setSelectedContact(contact));
-        serverFacade.getChat(contact.id, data => {
-            dispatch(setChat(data));});
+        this.props.messenger.onContactSelect(contact);
     }
 }
 

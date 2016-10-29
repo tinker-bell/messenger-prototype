@@ -1,26 +1,25 @@
 import React from 'react';
+import * as utils from '../utils'
 
 class MessageCard extends React.Component{
 
     render() {
         const {from, message, datetime} = this.props.message;
         var date = new Date(Date.parse(datetime));
-        var timeString = date.getHours() + ":" + date.getMinutes();
         const isMyMessage = from === this.props.account.id;
-        // TODO: think of smth better then <table>
-        return <table style={{width: "100%", marginTop: "6px", marginBottom: "6px"}}>
-        <tbody>
-        <tr>
-            <td width="50px">
+
+        return <div style={{width: "100%", margin: "15px 0",
+            display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center'}}>
+            <div style={{width: "50px"}}>
                 {this.getIcon(isMyMessage)}
-            </td>
-            <td>
+            </div>
+            <div style={{flexGrow: 2}}>
                 {isMyMessage ? this.getMyMessageBubble(message) : this.getFromMessageBubble(message)}
-            </td>
-            <td className="message-time" style={{textAlign: "right", width: "50px"}}>{timeString}</td>
-        </tr>
-        </tbody>
-        </table>;
+            </div>
+            <div className="alt-text" style={{textAlign: "right", width: "60px", whiteSpace: 'nowrap'}}>
+                {utils.toTimeString(date)}
+            </div>
+        </div>;
     }
 
     getMyMessageBubble(message) {

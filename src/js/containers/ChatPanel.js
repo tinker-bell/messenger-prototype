@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux'
 import MessagesPanel from './MessagesPanel'
 import ContactDetails from './ContactDetails'
-import SubmitMessageForm from './SubmitMessageForm'
+import SubmitMessageForm from '../components/SubmitMessageForm'
 import { newMessage } from '../actions'
 
 

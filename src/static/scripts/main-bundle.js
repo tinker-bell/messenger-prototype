@@ -64,19 +64,19 @@
 
 	var _componentsApp2 = _interopRequireDefault(_componentsApp);
 
-	var _reducers = __webpack_require__(243);
+	var _reducers = __webpack_require__(246);
 
 	var _reducers2 = _interopRequireDefault(_reducers);
 
-	var _MessagesWebSocket = __webpack_require__(252);
+	var _MessagesWebSocket = __webpack_require__(255);
 
 	var _MessagesWebSocket2 = _interopRequireDefault(_MessagesWebSocket);
 
-	var _ServerFacade = __webpack_require__(253);
+	var _ServerFacade = __webpack_require__(256);
 
-	var _actions = __webpack_require__(235);
+	var _actions = __webpack_require__(237);
 
-	var _Messenger = __webpack_require__(254);
+	var _Messenger = __webpack_require__(257);
 
 	var _Messenger2 = _interopRequireDefault(_Messenger);
 
@@ -95,7 +95,7 @@
 	(0, _reactDom.render)(_react2['default'].createElement(
 	  _reactRedux.Provider,
 	  { store: store },
-	  _react2['default'].createElement(_componentsApp2['default'], { messagesWS: messagesWS, serverFacade: serverFacade })
+	  _react2['default'].createElement(_componentsApp2['default'], { messenger: messenger, messagesWS: messagesWS })
 	), document.getElementById('root'));
 
 /***/ },
@@ -23116,11 +23116,11 @@
 
 	var _containersChatPanel2 = _interopRequireDefault(_containersChatPanel);
 
-	var _containersContactsList = __webpack_require__(239);
+	var _containersContactsList = __webpack_require__(242);
 
 	var _containersContactsList2 = _interopRequireDefault(_containersContactsList);
 
-	var _containersAccountDetails = __webpack_require__(241);
+	var _containersAccountDetails = __webpack_require__(244);
 
 	var _containersAccountDetails2 = _interopRequireDefault(_containersAccountDetails);
 
@@ -23145,7 +23145,7 @@
 	                    'div',
 	                    { className: 'sidebar' },
 	                    _react2['default'].createElement(_containersAccountDetails2['default'], null),
-	                    _react2['default'].createElement(_containersContactsList2['default'], { serverFacade: this.props.serverFacade })
+	                    _react2['default'].createElement(_containersContactsList2['default'], { messenger: this.props.messenger })
 	                ),
 	                !!selectedContact ? _react2['default'].createElement(_containersChatPanel2['default'], { messagesWS: this.props.messagesWS }) : null
 	            );
@@ -23630,15 +23630,15 @@
 
 	var _MessagesPanel2 = _interopRequireDefault(_MessagesPanel);
 
-	var _ContactDetails = __webpack_require__(237);
+	var _ContactDetails = __webpack_require__(240);
 
 	var _ContactDetails2 = _interopRequireDefault(_ContactDetails);
 
-	var _SubmitMessageForm = __webpack_require__(238);
+	var _componentsSubmitMessageForm = __webpack_require__(241);
 
-	var _SubmitMessageForm2 = _interopRequireDefault(_SubmitMessageForm);
+	var _componentsSubmitMessageForm2 = _interopRequireDefault(_componentsSubmitMessageForm);
 
-	var _actions = __webpack_require__(235);
+	var _actions = __webpack_require__(237);
 
 	var ChatPanel = (function (_React$Component) {
 	    _inherits(ChatPanel, _React$Component);
@@ -23657,7 +23657,7 @@
 	                null,
 	                _react2['default'].createElement(_ContactDetails2['default'], null),
 	                _react2['default'].createElement(_MessagesPanel2['default'], null),
-	                _react2['default'].createElement(_SubmitMessageForm2['default'], { onSubmit: this.onSubmit.bind(this) })
+	                _react2['default'].createElement(_componentsSubmitMessageForm2['default'], { onSubmit: this.onSubmit.bind(this) })
 	            );
 	        }
 	    }, {
@@ -23706,6 +23706,8 @@
 
 	var _interopRequireDefault = __webpack_require__(1)['default'];
 
+	var _interopRequireWildcard = __webpack_require__(233)['default'];
+
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
@@ -23716,11 +23718,19 @@
 
 	var _reactRedux = __webpack_require__(192);
 
-	var _componentsMessageCard = __webpack_require__(233);
+	var _componentsMessageCard = __webpack_require__(234);
 
 	var _componentsMessageCard2 = _interopRequireDefault(_componentsMessageCard);
 
-	var _actions = __webpack_require__(235);
+	var _actions = __webpack_require__(237);
+
+	var _componentsDelimiter = __webpack_require__(239);
+
+	var _componentsDelimiter2 = _interopRequireDefault(_componentsDelimiter);
+
+	var _utils = __webpack_require__(235);
+
+	var utils = _interopRequireWildcard(_utils);
 
 	var MessagesPanel = (function (_React$Component) {
 	    _inherits(MessagesPanel, _React$Component);
@@ -23732,20 +23742,46 @@
 	    }
 
 	    _createClass(MessagesPanel, [{
+	        key: 'componentDidUpdate',
+	        value: function componentDidUpdate() {
+	            this.panel.scrollTop = this.panel.scrollHeight;
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
+	            var _this = this;
+
 	            var _props = this.props;
 	            var chat = _props.chat;
 	            var account = _props.account;
 
-	            var key = 1;
+	            var items = [];
+	            var key = 0;
+	            var prevDate = new Date(1900, 1, 1);
+	            var today = new Date(Date.now());
+
+	            for (var i = 0; i < chat.length; i++) {
+	                var message = chat[i];
+	                var date = utils.getDateOnly(new Date(Date.parse(message.datetime)));
+	                if (date > prevDate) {
+	                    items.push(_react2['default'].createElement(_componentsDelimiter2['default'], { key: key++, text: this.getDateString(date, today) }));
+	                }
+	                prevDate = date;
+	                items.push(_react2['default'].createElement(_componentsMessageCard2['default'], { message: message, key: key++, account: account }));
+	            }
+
 	            return _react2['default'].createElement(
 	                'div',
-	                { className: 'messages-panel' },
-	                chat.map(function (m) {
-	                    return _react2['default'].createElement(_componentsMessageCard2['default'], { message: m, key: key++, account: account });
-	                })
+	                { className: 'messages-panel', ref: function (node) {
+	                        return _this.panel = node;
+	                    } },
+	                items
 	            );
+	        }
+	    }, {
+	        key: 'getDateString',
+	        value: function getDateString(date, today) {
+	            return utils.isEqualDates(date, today) ? "Today" : utils.toDateString(date);
 	        }
 	    }]);
 
@@ -23764,21 +23800,48 @@
 
 /***/ },
 /* 233 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
 
-	var _get = __webpack_require__(202)["default"];
+	exports["default"] = function (obj) {
+	  if (obj && obj.__esModule) {
+	    return obj;
+	  } else {
+	    var newObj = {};
 
-	var _inherits = __webpack_require__(218)["default"];
+	    if (obj != null) {
+	      for (var key in obj) {
+	        if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+	      }
+	    }
 
-	var _createClass = __webpack_require__(227)["default"];
+	    newObj["default"] = obj;
+	    return newObj;
+	  }
+	};
 
-	var _classCallCheck = __webpack_require__(230)["default"];
+	exports.__esModule = true;
 
-	var _interopRequireDefault = __webpack_require__(1)["default"];
+/***/ },
+/* 234 */
+/***/ function(module, exports, __webpack_require__) {
 
-	Object.defineProperty(exports, "__esModule", {
+	'use strict';
+
+	var _get = __webpack_require__(202)['default'];
+
+	var _inherits = __webpack_require__(218)['default'];
+
+	var _createClass = __webpack_require__(227)['default'];
+
+	var _classCallCheck = __webpack_require__(230)['default'];
+
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+
+	var _interopRequireWildcard = __webpack_require__(233)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
 
@@ -23786,17 +23849,21 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _utils = __webpack_require__(235);
+
+	var utils = _interopRequireWildcard(_utils);
+
 	var MessageCard = (function (_React$Component) {
 	    _inherits(MessageCard, _React$Component);
 
 	    function MessageCard() {
 	        _classCallCheck(this, MessageCard);
 
-	        _get(Object.getPrototypeOf(MessageCard.prototype), "constructor", this).apply(this, arguments);
+	        _get(Object.getPrototypeOf(MessageCard.prototype), 'constructor', this).apply(this, arguments);
 	    }
 
 	    _createClass(MessageCard, [{
-	        key: "render",
+	        key: 'render',
 	        value: function render() {
 	            var _props$message = this.props.message;
 	            var from = _props$message.from;
@@ -23804,42 +23871,34 @@
 	            var datetime = _props$message.datetime;
 
 	            var date = new Date(Date.parse(datetime));
-	            var timeString = date.getHours() + ":" + date.getMinutes();
 	            var isMyMessage = from === this.props.account.id;
-	            // TODO: think of smth better then <table>
-	            return _react2["default"].createElement(
-	                "table",
-	                { style: { width: "100%", marginTop: "6px", marginBottom: "6px" } },
-	                _react2["default"].createElement(
-	                    "tbody",
-	                    null,
-	                    _react2["default"].createElement(
-	                        "tr",
-	                        null,
-	                        _react2["default"].createElement(
-	                            "td",
-	                            { width: "50px" },
-	                            this.getIcon(isMyMessage)
-	                        ),
-	                        _react2["default"].createElement(
-	                            "td",
-	                            null,
-	                            isMyMessage ? this.getMyMessageBubble(message) : this.getFromMessageBubble(message)
-	                        ),
-	                        _react2["default"].createElement(
-	                            "td",
-	                            { className: "message-time", style: { textAlign: "right", width: "50px" } },
-	                            timeString
-	                        )
-	                    )
+
+	            return _react2['default'].createElement(
+	                'div',
+	                { style: { width: "100%", margin: "15px 0",
+	                        display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center' } },
+	                _react2['default'].createElement(
+	                    'div',
+	                    { style: { width: "50px" } },
+	                    this.getIcon(isMyMessage)
+	                ),
+	                _react2['default'].createElement(
+	                    'div',
+	                    { style: { flexGrow: 2 } },
+	                    isMyMessage ? this.getMyMessageBubble(message) : this.getFromMessageBubble(message)
+	                ),
+	                _react2['default'].createElement(
+	                    'div',
+	                    { className: 'alt-text', style: { textAlign: "right", width: "60px", whiteSpace: 'nowrap' } },
+	                    utils.toTimeString(date)
 	                )
 	            );
 	        }
 	    }, {
-	        key: "getMyMessageBubble",
+	        key: 'getMyMessageBubble',
 	        value: function getMyMessageBubble(message) {
-	            return _react2["default"].createElement(
-	                "div",
+	            return _react2['default'].createElement(
+	                'div',
 	                { style: {
 	                        display: 'flex',
 	                        flexDirection: 'row',
@@ -23847,19 +23906,19 @@
 	                        alignItems: 'center',
 	                        marginLeft: "30px"
 	                    } },
-	                _react2["default"].createElement(
-	                    "div",
-	                    { className: "bubble my-message" },
+	                _react2['default'].createElement(
+	                    'div',
+	                    { className: 'bubble my-message' },
 	                    message
 	                ),
-	                _react2["default"].createElement("div", { className: "bubble-pointer-right" })
+	                _react2['default'].createElement('div', { className: 'bubble-pointer-right' })
 	            );
 	        }
 	    }, {
-	        key: "getFromMessageBubble",
+	        key: 'getFromMessageBubble',
 	        value: function getFromMessageBubble(message) {
-	            return _react2["default"].createElement(
-	                "div",
+	            return _react2['default'].createElement(
+	                'div',
 	                { style: {
 	                        display: 'flex',
 	                        flexDirection: 'row',
@@ -23867,36 +23926,67 @@
 	                        alignItems: 'center',
 	                        marginRight: '8px'
 	                    } },
-	                _react2["default"].createElement("div", { className: "bubble-pointer-left" }),
-	                _react2["default"].createElement(
-	                    "div",
-	                    { className: "bubble from-message" },
+	                _react2['default'].createElement('div', { className: 'bubble-pointer-left' }),
+	                _react2['default'].createElement(
+	                    'div',
+	                    { className: 'bubble from-message' },
 	                    message
 	                )
 	            );
 	        }
 	    }, {
-	        key: "getIcon",
+	        key: 'getIcon',
 	        value: function getIcon(isMyMessage) {
-	            return !isMyMessage ? _react2["default"].createElement("img", { alt: "", src: __webpack_require__(234),
-	                width: "35px", height: "35px", style: { marginRight: '5px', marginLeft: '10px' } }) : null;
+	            return !isMyMessage ? _react2['default'].createElement('img', { alt: '', src: __webpack_require__(236),
+	                width: '35px', height: '35px', style: { marginRight: '5px', marginLeft: '10px' } }) : null;
 	        }
 	    }]);
 
 	    return MessageCard;
-	})(_react2["default"].Component);
+	})(_react2['default'].Component);
 
-	exports["default"] = MessageCard;
-	module.exports = exports["default"];
-
-/***/ },
-/* 234 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__.p + "images/default-icon.ce59ae4f.png";
+	exports['default'] = MessageCard;
+	module.exports = exports['default'];
 
 /***/ },
 /* 235 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.getDateOnly = getDateOnly;
+	exports.toDateString = toDateString;
+	exports.toTimeString = toTimeString;
+	exports.isEqualDates = isEqualDates;
+
+	function getDateOnly(date) {
+	    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+	}
+
+	function toDateString(date) {
+	    return date.getDate() + " " + date.toLocaleString("en-us", { month: "long" });
+	}
+
+	function toTimeString(date) {
+	    var options = { hour: "2-digit", minute: "2-digit" };
+	    return date.toLocaleTimeString("en-us", options);
+	}
+
+	function isEqualDates(date1, date2) {
+	    return date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth() && date1.getDate() === date2.getDate();
+	}
+
+/***/ },
+/* 236 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__.p + "images/default-icon.png";
+
+/***/ },
+/* 237 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23905,7 +23995,7 @@
 	        value: true
 	});
 
-	var _constants = __webpack_require__(236);
+	var _constants = __webpack_require__(238);
 
 	var setContactsList = function setContactsList(contacts) {
 	        return {
@@ -23940,7 +24030,7 @@
 	exports.newMessage = newMessage;
 
 /***/ },
-/* 236 */
+/* 238 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -23961,7 +24051,73 @@
 	exports.NEW_MESSAGE = NEW_MESSAGE;
 
 /***/ },
-/* 237 */
+/* 239 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _get = __webpack_require__(202)['default'];
+
+	var _inherits = __webpack_require__(218)['default'];
+
+	var _createClass = __webpack_require__(227)['default'];
+
+	var _classCallCheck = __webpack_require__(230)['default'];
+
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _react = __webpack_require__(6);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var Delimiter = (function (_React$Component) {
+	    _inherits(Delimiter, _React$Component);
+
+	    function Delimiter() {
+	        _classCallCheck(this, Delimiter);
+
+	        _get(Object.getPrototypeOf(Delimiter.prototype), 'constructor', this).apply(this, arguments);
+	    }
+
+	    _createClass(Delimiter, [{
+	        key: 'render',
+	        value: function render() {
+	            return _react2['default'].createElement(
+	                'div',
+	                { style: { display: 'flex', alignItems: 'center', margin: '15px 0' } },
+	                _react2['default'].createElement('div', { style: delimiterStyles }),
+	                _react2['default'].createElement(
+	                    'div',
+	                    { style: { margin: '0 15px', whiteSpace: 'nowrap' }, className: 'alt-text' },
+	                    this.props.text
+	                ),
+	                _react2['default'].createElement('div', { style: delimiterStyles })
+	            );
+	        }
+	    }]);
+
+	    return Delimiter;
+	})(_react2['default'].Component);
+
+	exports['default'] = Delimiter;
+
+	var delimiterStyles = {
+	    width: '100%',
+	    height: '1px',
+	    borderTopStyle: 'solid',
+	    borderTopColor: "#EEEEEE",
+	    flexGrow: 2,
+	    borderTopWidth: '1px'
+
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 240 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24008,7 +24164,7 @@
 	                _react2['default'].createElement(
 	                    'div',
 	                    { style: { display: 'flex', flexDirection: 'row', flexWrap: 'nowrap' } },
-	                    _react2['default'].createElement('img', { alt: '', src: __webpack_require__(234),
+	                    _react2['default'].createElement('img', { alt: '', src: __webpack_require__(236),
 	                        width: '35px', height: '35px', style: { marginRight: '10px' } }),
 	                    _react2['default'].createElement(
 	                        'div',
@@ -24042,7 +24198,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 238 */
+/* 241 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24078,24 +24234,6 @@
 	    }
 
 	    _createClass(SubmitMessageForm, [{
-	        key: "onMessageChange",
-	        value: function onMessageChange(ev) {
-	            this.setState({ messageText: ev.target.value });
-	        }
-	    }, {
-	        key: "onSubmit",
-	        value: function onSubmit(ev) {
-	            ev.preventDefault();
-	            console.log(ev);
-	            console.log(this.state.messageText);
-	            if (!this.state.messageText.trim()) {
-	                return;
-	            }
-
-	            this.props.onSubmit(this.state.messageText);
-	            this.setState({ messageText: "" });
-	        }
-	    }, {
 	        key: "render",
 	        value: function render() {
 	            return _react2["default"].createElement(
@@ -24104,16 +24242,40 @@
 	                _react2["default"].createElement(
 	                    "form",
 	                    { onSubmit: this.onSubmit },
-	                    _react2["default"].createElement("input", { type: "text",
-	                        value: this.state.messageText,
-	                        onChange: this.onMessageChange }),
 	                    _react2["default"].createElement(
-	                        "button",
-	                        { type: "submit" },
-	                        "Submit Message"
+	                        "div",
+	                        { style: { display: "flex", flexDirection: 'row', width: '100%' } },
+	                        _react2["default"].createElement("textarea", { type: "text", placeholder: "Enter your text here...",
+	                            value: this.state.messageText, maxLength: 2000, rows: 3,
+	                            onChange: this.onMessageChange, onKeyPress: this.onKeyPress.bind(this), style: textAreaStyle })
 	                    )
 	                )
 	            );
+	        }
+	    }, {
+	        key: "onKeyPress",
+	        value: function onKeyPress(ev) {
+	            if (ev.key === "Enter") {
+	                ev.preventDefault();
+	                this.onSubmit(ev);
+	                return false;
+	            }
+	        }
+	    }, {
+	        key: "onMessageChange",
+	        value: function onMessageChange(ev) {
+	            this.setState({ messageText: ev.target.value });
+	        }
+	    }, {
+	        key: "onSubmit",
+	        value: function onSubmit(ev) {
+	            ev.preventDefault();
+	            if (!this.state.messageText.trim()) {
+	                return;
+	            }
+
+	            this.props.onSubmit(this.state.messageText);
+	            this.setState({ messageText: "" });
 	        }
 	    }]);
 
@@ -24121,10 +24283,20 @@
 	})(_react2["default"].Component);
 
 	exports["default"] = SubmitMessageForm;
+
+	var textAreaStyle = {
+	    marginTop: '10px',
+	    marginLeft: '10px',
+	    marginRight: '20px',
+	    border: 'none',
+	    width: '100%',
+	    resize: 'none'
+	};
 	module.exports = exports["default"];
+	/*<div>*/ /*<button type="submit">*/ /*Submit Message*/ /*</button>*/ /*</div>*/
 
 /***/ },
-/* 239 */
+/* 242 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24151,9 +24323,7 @@
 
 	var _reactRedux = __webpack_require__(192);
 
-	var _componentsContactItem = __webpack_require__(240);
-
-	var _actions = __webpack_require__(235);
+	var _componentsContactItem = __webpack_require__(243);
 
 	var ContactsList = (function (_React$Component) {
 	    _inherits(ContactsList, _React$Component);
@@ -24192,14 +24362,7 @@
 	    }, {
 	        key: 'onSelectContact',
 	        value: function onSelectContact(contact) {
-	            var _props2 = this.props;
-	            var dispatch = _props2.dispatch;
-	            var serverFacade = _props2.serverFacade;
-
-	            dispatch((0, _actions.setSelectedContact)(contact));
-	            serverFacade.getChat(contact.id, function (data) {
-	                dispatch((0, _actions.setChat)(data));
-	            });
+	            this.props.messenger.onContactSelect(contact);
 	        }
 	    }]);
 
@@ -24217,7 +24380,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 240 */
+/* 243 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24302,7 +24465,7 @@
 	exports.ContactItem = ContactItem;
 
 /***/ },
-/* 241 */
+/* 244 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24345,7 +24508,7 @@
 	                'div',
 	                { style: { display: 'flex', flexDirection: 'row', flexWrap: 'nowrap',
 	                        alignItems: 'center', marginTop: '10px', marginLeft: '20px' } },
-	                _react2['default'].createElement('img', { alt: '', src: __webpack_require__(242),
+	                _react2['default'].createElement('img', { alt: '', src: __webpack_require__(245),
 	                    width: '35px', height: '35px', style: { marginRight: '10px' } }),
 	                _react2['default'].createElement(
 	                    'div',
@@ -24378,13 +24541,13 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 242 */
+/* 245 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__.p + "images/charge-icon.5755d082.png";
+	module.exports = __webpack_require__.p + "images/charge-icon.png";
 
 /***/ },
-/* 243 */
+/* 246 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -24397,11 +24560,11 @@
 
 	var _redux = __webpack_require__(177);
 
-	var _chat = __webpack_require__(244);
+	var _chat = __webpack_require__(247);
 
 	var _chat2 = _interopRequireDefault(_chat);
 
-	var _contacts = __webpack_require__(251);
+	var _contacts = __webpack_require__(254);
 
 	var _contacts2 = _interopRequireDefault(_contacts);
 
@@ -24421,19 +24584,19 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 244 */
+/* 247 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _extends = __webpack_require__(245)['default'];
+	var _extends = __webpack_require__(248)['default'];
 
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
 	exports['default'] = chat;
 
-	var _actionsConstants = __webpack_require__(236);
+	var _actionsConstants = __webpack_require__(238);
 
 	function chat(state, action) {
 	    if (state === undefined) state = { chat: [] };
@@ -24442,7 +24605,6 @@
 	        case _actionsConstants.SET_CHAT:
 	            return _extends({}, state, { chat: action.payload });
 	        case _actionsConstants.NEW_MESSAGE:
-	            console.log(action);
 	            var newState = state.chat.slice();
 	            newState.push(action.payload);
 	            return { chat: newState };
@@ -24454,12 +24616,12 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 245 */
+/* 248 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var _Object$assign = __webpack_require__(246)["default"];
+	var _Object$assign = __webpack_require__(249)["default"];
 
 	exports["default"] = _Object$assign || function (target) {
 	  for (var i = 1; i < arguments.length; i++) {
@@ -24478,34 +24640,34 @@
 	exports.__esModule = true;
 
 /***/ },
-/* 246 */
+/* 249 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(247), __esModule: true };
+	module.exports = { "default": __webpack_require__(250), __esModule: true };
 
 /***/ },
-/* 247 */
+/* 250 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(248);
+	__webpack_require__(251);
 	module.exports = __webpack_require__(214).Object.assign;
 
 /***/ },
-/* 248 */
+/* 251 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.3.1 Object.assign(target, source)
 	var $export = __webpack_require__(212);
 
-	$export($export.S + $export.F, 'Object', {assign: __webpack_require__(249)});
+	$export($export.S + $export.F, 'Object', {assign: __webpack_require__(252)});
 
 /***/ },
-/* 249 */
+/* 252 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.2.1 Object.assign(target, source, ...)
 	var $        = __webpack_require__(205)
-	  , toObject = __webpack_require__(250)
+	  , toObject = __webpack_require__(253)
 	  , IObject  = __webpack_require__(208);
 
 	// should work with symbols and should have deterministic property order (V8 bug)
@@ -24538,7 +24700,7 @@
 	} : Object.assign;
 
 /***/ },
-/* 250 */
+/* 253 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 7.1.13 ToObject(argument)
@@ -24548,19 +24710,19 @@
 	};
 
 /***/ },
-/* 251 */
+/* 254 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _extends = __webpack_require__(245)['default'];
+	var _extends = __webpack_require__(248)['default'];
 
 	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
 	exports['default'] = contacts;
 
-	var _actionsConstants = __webpack_require__(236);
+	var _actionsConstants = __webpack_require__(238);
 
 	function contacts(state, action) {
 	    if (state === undefined) state = { contacts: [], selectedContact: null };
@@ -24578,7 +24740,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 252 */
+/* 255 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24670,7 +24832,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 253 */
+/* 256 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -24719,20 +24881,20 @@
 	;
 
 /***/ },
-/* 254 */
+/* 257 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
-	var _createClass = __webpack_require__(227)["default"];
+	var _createClass = __webpack_require__(227)['default'];
 
-	var _classCallCheck = __webpack_require__(230)["default"];
+	var _classCallCheck = __webpack_require__(230)['default'];
 
-	Object.defineProperty(exports, "__esModule", {
+	Object.defineProperty(exports, '__esModule', {
 	    value: true
 	});
 
-	var _actions = __webpack_require__(235);
+	var _actions = __webpack_require__(237);
 
 	var Messenger = (function () {
 	    function Messenger(account, store, serverFacade) {
@@ -24744,22 +24906,28 @@
 	    }
 
 	    _createClass(Messenger, [{
-	        key: "onNewMessage",
+	        key: 'onNewMessage',
 	        value: function onNewMessage(message) {
 	            var state = this.store.getState();
-	            console.log(state.contacts.selectedContact);
-	            console.log(message.from);
-	            if (state.contacts.selectedContact.id === message.from) {
-	                console.log("dispatch");
-	                console.log("message");
+	            if (!!state.contacts.selectedContact && state.contacts.selectedContact.id === message.from) {
 	                this.store.dispatch((0, _actions.newMessage)(message));
 	            } else {
-	                console.log("reload contacts");
 	                this.reloadContacts();
 	            }
 	        }
 	    }, {
-	        key: "reloadContacts",
+	        key: 'onContactSelect',
+	        value: function onContactSelect(contact) {
+	            var _this = this;
+
+	            this.store.dispatch((0, _actions.setSelectedContact)(contact));
+	            this.serverFacade.getChat(contact.id, function (data) {
+	                _this.store.dispatch((0, _actions.setChat)(data));
+	                _this.reloadContacts();
+	            });
+	        }
+	    }, {
+	        key: 'reloadContacts',
 	        value: function reloadContacts() {
 	            var dispatch = function dispatch(data) {
 	                this.store.dispatch((0, _actions.setContactsList)(data['contacts']));
@@ -24771,8 +24939,8 @@
 	    return Messenger;
 	})();
 
-	exports["default"] = Messenger;
-	module.exports = exports["default"];
+	exports['default'] = Messenger;
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ]);

@@ -22,7 +22,7 @@ module.exports = {
                 test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
                 exclude: /\/favicon.ico$/,
                 loader: 'file-loader',
-                query: { name: 'images/[name].[hash:8].[ext]' }
+                query: { name: 'images/[name].[ext]' }
             },
         ]
     },

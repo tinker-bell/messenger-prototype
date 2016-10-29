@@ -44,7 +44,7 @@ html, body {
   text-overflow: ellipsis;
   max-width: 100px; }
 
-.message-time {
+.alt-text {
   color: #9E9E9E;
   font-size: 12px; }
 
@@ -116,6 +116,7 @@ html, body {
 .submit-message-panel {
   height: 75px;
   position: absolute;
+  width: calc(100% - 200px);
   bottom: 0; }
 
 .my-message {

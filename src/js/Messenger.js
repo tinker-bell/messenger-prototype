@@ -1,4 +1,4 @@
-import { newMessage, setContactsList } from './actions'
+import { newMessage, setContactsList, setSelectedContact, setChat } from './actions'
 
 export default class Messenger {
     constructor(account, store, serverFacade) {
@@ -9,17 +9,20 @@ export default class Messenger {
 
     onNewMessage(message) {
         var state = this.store.getState();
-        console.log(state.contacts.selectedContact );
-        console.log(message.from)
-        if (state.contacts.selectedContact.id === message.from) {
-            console.log("dispatch")
-            console.log("message")
+        if (!!state.contacts.selectedContact && state.contacts.selectedContact.id === message.from) {
             this.store.dispatch(newMessage(message));
         }
         else {
-            console.log("reload contacts")
             this.reloadContacts();
         }
+    }
+
+    onContactSelect(contact){
+        this.store.dispatch(setSelectedContact(contact));
+        this.serverFacade.getChat(contact.id, data => {
+            this.store.dispatch(setChat(data));
+            this.reloadContacts();
+        });
     }
 
     reloadContacts() {
