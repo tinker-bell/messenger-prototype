@@ -1,0 +1,9 @@
+export const SET_CONTACTS_LIST = "SET_CONTACTS_LIST";
+
+export const SET_SELECTED_CONTACT = "SET_SELECTED_CONTACT";
+
+export const SET_CHAT = "SET_CHAT";
+
+export const NEW_MESSAGE = "NEW_MESSAGE";
+
+

@@ -1,0 +1,20 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# dependencies
+node_modules
+env
+
+# testing
+coverage
+
+# production
+build
+
+# misc
+__pycache__
+app-engine
+.idea
+.DS_Store
+npm-debug.log
+npm-debug.log*
+.vscode
